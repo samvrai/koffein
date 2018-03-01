@@ -1,4 +1,4 @@
-{% extends 'coffees/menu.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <a class="btn btn-primary" href="/new_batch/" role="button">Nuevo lote</a>
@@ -19,8 +19,9 @@
         <td>{{order.shipping}}</td>
         <td>{% if order.closed %}Sí{% else %}No{% endif %}</td>
         <td>
-            <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_batch/{{order.id}}{% endif %}" role="button">Editar</a>
-            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_batch/{{order.id}}{% endif %}" role="button">Eliminar</a>
+            <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_order/{{order.id}}{% endif %}" role="button">Editar</a>
+            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_order/{{order.id}}{% endif %}" role="button">Eliminar</a>
+            <a class="btn btn-dark {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/order/{{order.id}}{% endif %}" role="button">Lista</a>
         </td>
     </tr>
     {% endfor %}

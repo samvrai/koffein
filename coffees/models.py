@@ -37,3 +37,6 @@ class CoffeeUserOrder(models.Model):
     coffee_user = models.ForeignKey(CoffeeUser, on_delete=models.CASCADE)
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.coffee_user.name

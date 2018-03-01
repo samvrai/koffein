@@ -1,9 +1,5 @@
 from django import forms
-from .models import Order
-
-
-class SearchForm(forms.Form):
-    username = forms.CharField(help_text='nombre de usuario', widget=forms.TextInput(attrs={'class': 'form-control'}))
+from .models import Order, CoffeeUser, Coffee
 
 
 class OrderCreate(forms.ModelForm):
@@ -40,3 +36,23 @@ class OrderUpdate(forms.ModelForm):
             'shipping': forms.NumberInput(attrs={'class': 'form-control', 'id': 'shipping', 'placeholder': '00,00'}),
             'closed': forms.CheckboxInput(attrs={'class': 'form-control', 'id': 'closed'})
         }
+
+
+class UserCreate(forms.Form):
+    model = CoffeeUser
+
+    class Meta:
+        CHOICES = Coffee.objects.defer('name').all()
+        fields = ['coffee', 'quantity'],
+        labels = {
+            'coffee': 'Café',
+            'quantity': 'Cantidad'
+        },
+        widgets = {
+            'coffee': forms.ChoiceField(choices=CHOICES),
+            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'id': 'quantity', 'placeholder': '00'})
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.order = kwargs.pop('order')
+        super(UserCreate, self).__init__(*args, **kwargs)

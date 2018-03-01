@@ -1,28 +1,35 @@
-from django.shortcuts import render, redirect
 from django.views import generic
-from .models import Coffee, CoffeeUser, Order, User
-from coffees.forms import SearchForm, OrderCreate, OrderUpdate
+from .models import Coffee, Order, User, CoffeeUserOrder
+from coffees.forms import OrderCreate, OrderUpdate, UserCreate
 
 
 # Create your views here.
 class IndexView(generic.TemplateView):
-    template_name = 'coffees/menu.html'
+    template_name = 'base.html'
 
 
-class CoffeesView(generic.ListView):
-    template_name = 'coffees/coffees.html'
+class CoffeeListView(generic.ListView):
+    model = Coffee
     context_object_name = 'coffee_list'
 
-    def get_queryset(self):
-        return Coffee.objects.all()
 
-
-class OrderView(generic.ListView):
-    template_name = 'coffees/orders.html'
+class OrderListView(generic.ListView):
+    model = Order
     context_object_name = 'order_list'
+
+
+class OrderUserListView(generic.ListView):
+    model = CoffeeUserOrder
+    template_name = 'coffees/order_user.html'
+    context_object_name = 'user_list'
 
     def get_queryset(self):
         return Order.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(OrderUserListView, self).get_context_data(**kwargs)
+        context['order'] = self.kwargs['pk']
+        return context
 
 
 class OrderCreate(generic.CreateView):
@@ -42,30 +49,41 @@ class OrderDelete(generic.DeleteView):
     success_url = '/order'
 
 
-class UserView(generic.TemplateView):
-    template_name = 'coffees/user.html'
+class UserListView(generic.ListView):
+    model = User
 
-    def post(self, request):
-        form = SearchForm(request.POST)
-        if form.is_valid():
-            try:
-                user = User.objects.get(name=form.cleaned_data['username'])
-            except User.DoesNotExist:
-                user = User(name=form.cleaned_data['username'])
-                user.save()
-            order = Order.objects.get(closed=False)
-            coffee_list = CoffeeUser.objects.defer('coffee', 'quantity').filter(user=user.id, cofeeuserorder__id=order.id)
-            return redirect('/update_user/', coffee_list)
+    def get_queryset(self):
+        try:
+            username = self.request.GET['username']
+        except KeyError:
+            username = ''
 
-    def get(self, request, *args, **kwargs):
-        form = SearchForm()
-        return render(request, self.template_name, {'form': form})
+        if username != '':
+            object_list = self.model.objects.filter(name__icontains=username)
+        else:
+            object_list = self.model.objects.all()
+        return object_list
+
+    def get_context_data(self, **kwargs):
+        context = super(UserListView, self).get_context_data(**kwargs)
+        context['filter'] = self.request.GET.get('filter', '')
+        return context
 
 
-class UpdateUserView(generic.FormView):
+class UserOrderListView(generic.ListView):
+    model = CoffeeUserOrder
+    template_name = 'coffees/coffeeuserorder_list.html'
+
+
+class UserCreate(generic.FormView):
+    template_name = 'coffees/user_form.html'
+    form_class = UserCreate
+    success_url = 'orders'
+
+
+class UserUpdate(generic.FormView):
     template_name = 'coffees/update_user.html'
-    form_class = None
-    success_url = '/order/'
 
-    def form_valid(self, form):
-        return True
+    def get_context_data(self, **kwargs):
+        context = super(UserUpdate, self).get_context_data(**kwargs)
+        coffee_list = CoffeeUserOrder.objects.filter(order__id=self.kwargs['order'], user__name_icontains=self.request.user)

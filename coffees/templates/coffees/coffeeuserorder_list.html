@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Pedido</th>
+        <th scope="col">Pagado</th>
+        <th scope="col">Detalles</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for order in order_list %}
+    <tr>
+        <td>{{coffee.name}}</td>
+        <td>{{coffee.intensity}}</td>
+        <td>
+            <a class="btn btn-dark" href="/user/{{user.id}}/{{order.id}}" role="button">Detalles</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
