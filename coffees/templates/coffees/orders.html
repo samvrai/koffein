@@ -6,19 +6,22 @@
 <table class="table table-striped">
     <thead class="thead-dark">
     <tr>
-        <th scope="col">Id</th>
         <th scope="col">Fecha de cierre</th>
         <th scope="col">Portes</th>
         <th scope="col">Cerrado</th>
+        <th scope="col">Actualizar</th>
     </tr>
     </thead>
     <tbody>
     {% for order in order_list %}
     <tr>
-        <td>{{order.id}}</td>
         <td>{{order.date}}</td>
         <td>{{order.shipping}}</td>
-        <td>{{order.closed}}</td>
+        <td>{% if order.closed %}Sí{% else %}No{% endif %}</td>
+        <td>
+            <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_batch/{{order.id}}{% endif %}" role="button">Editar</a>
+            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_batch/{{order.id}}{% endif %}" role="button">Eliminar</a>
+        </td>
     </tr>
     {% endfor %}
     </tbody>

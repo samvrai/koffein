@@ -30,6 +30,10 @@ class Order(models.Model):
 class CoffeeUser(models.Model):
     coffee = models.ForeignKey(Coffee, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
+
+
+class CoffeeUserOrder(models.Model):
+    coffee_user = models.ForeignKey(CoffeeUser, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     paid = models.BooleanField(default=False)

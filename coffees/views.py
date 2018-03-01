@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views import generic
 from .models import Coffee, CoffeeUser, Order, User
-from coffees.forms import SearchForm, UpdateUserForm, OrderForm
+from coffees.forms import SearchForm, OrderCreate, OrderUpdate
 
 
 # Create your views here.
@@ -17,7 +17,7 @@ class CoffeesView(generic.ListView):
         return Coffee.objects.all()
 
 
-class BatchView(generic.ListView):
+class OrderView(generic.ListView):
     template_name = 'coffees/orders.html'
     context_object_name = 'order_list'
 
@@ -25,9 +25,21 @@ class BatchView(generic.ListView):
         return Order.objects.all()
 
 
-class BatchCreate(generic.CreateView):
+class OrderCreate(generic.CreateView):
     model = Order
-    form_class = OrderForm
+    form_class = OrderCreate
+    success_url = '/order'
+
+
+class OrderUpdate(generic.UpdateView):
+    model = Order
+    form_class = OrderUpdate
+    success_url = '/order'
+
+
+class OrderDelete(generic.DeleteView):
+    model = Order
+    success_url = '/order'
 
 
 class UserView(generic.TemplateView):
@@ -42,7 +54,7 @@ class UserView(generic.TemplateView):
                 user = User(name=form.cleaned_data['username'])
                 user.save()
             order = Order.objects.get(closed=False)
-            coffee_list = CoffeeUser.objects.defer('coffee', 'quantity').filter(user=user.id, order=order.id)
+            coffee_list = CoffeeUser.objects.defer('coffee', 'quantity').filter(user=user.id, cofeeuserorder__id=order.id)
             return redirect('/update_user/', coffee_list)
 
     def get(self, request, *args, **kwargs):
@@ -52,7 +64,7 @@ class UserView(generic.TemplateView):
 
 class UpdateUserView(generic.FormView):
     template_name = 'coffees/update_user.html'
-    form_class = UpdateUserForm
+    form_class = None
     success_url = '/order/'
 
     def form_valid(self, form):
