@@ -1,10 +1,8 @@
 from django import forms
-from .models import Order, CoffeeUser, Coffee
+from .models import Order, User
 
 
 class OrderCreate(forms.ModelForm):
-    model = Order
-
     class Meta:
         model = Order
         fields = ['date', 'shipping']
@@ -20,8 +18,6 @@ class OrderCreate(forms.ModelForm):
 
 
 class OrderUpdate(forms.ModelForm):
-    model = Order
-
     class Meta:
         model = Order
         fields = ['date', 'shipping', 'closed']
@@ -38,21 +34,16 @@ class OrderUpdate(forms.ModelForm):
         }
 
 
-class UserCreate(forms.Form):
-    model = CoffeeUser
-
+class UserCreate(forms.ModelForm):
     class Meta:
-        CHOICES = Coffee.objects.defer('name').all()
-        fields = ['coffee', 'quantity'],
+        model = User
+        fields = ['name', 'paid']
+        excluded = ['orders']
         labels = {
-            'coffee': 'Café',
-            'quantity': 'Cantidad'
-        },
-        widgets = {
-            'coffee': forms.ChoiceField(choices=CHOICES),
-            'quantity': forms.NumberInput(attrs={'class': 'form-control', 'id': 'quantity', 'placeholder': '00'})
+            'name': 'Nombre',
+            'paid': 'Pagado',
         }
-
-    def __init__(self, *args, **kwargs):
-        self.order = kwargs.pop('order')
-        super(UserCreate, self).__init__(*args, **kwargs)
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'id': 'name', 'placeholder': 'nombre.apellido'}),
+            'paid': forms.HiddenInput(attrs={'id': 'paid', 'value': False, 'hidden': 'true'}),
+        }

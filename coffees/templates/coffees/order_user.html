@@ -14,7 +14,7 @@
     <tbody>
     {% for user in user_list %}
     <tr>
-        <td>{{user.coffee_user.user.name}}</td>
+        <td>{{user.name}}</td>
         <td>{% if user.paid %}Sí{% else %}No{% endif %}</td>
         <td>
             <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_user/{{order}}/{{user.id}}{% endif %}" role="button">Editar</a>

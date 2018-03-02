@@ -2,8 +2,9 @@
 
 {% block content %}
 <form action="" method="post">{% csrf_token %}
-    {{form.as_table}}
+    {{form.as_p}}
+    <input hidden="true" name="orders" value="{{order}}">
     <br>
-    <input class="btn btn-primary" type="submit" value="Guardar" />
+    <input class="btn btn-primary" type="submit" value="Siguiente" />
 </form>
 {% endblock %}
