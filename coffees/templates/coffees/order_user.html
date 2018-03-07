@@ -18,7 +18,7 @@
         <td>{% if user.paid %}Sí{% else %}No{% endif %}</td>
         <td>
             <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_user/{{order}}/{{user.id}}{% endif %}" role="button">Editar</a>
-            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_user/{{user.id}}{% endif %}" role="button">Eliminar</a>
+            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_user/{{order}}/{{user.id}}{% endif %}" role="button">Eliminar</a>
         </td>
     </tr>
     {% endfor %}

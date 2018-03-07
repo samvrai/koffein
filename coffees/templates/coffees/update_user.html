@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if userc %}
-<form method="post" action="{% url 'coffees:update' %}">{% csrf_token %}
+<form method="post" action="{% url 'coffees:update_user' order user %}">{% csrf_token %}
+    {{form.as_table}}
+    <br>
     <button type="submit" class="btn btn-primary">Confirmar</button>
 </form>
-{% endif %}
 {% endblock %}
