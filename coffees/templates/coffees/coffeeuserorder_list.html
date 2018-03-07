@@ -10,12 +10,12 @@
     </tr>
     </thead>
     <tbody>
-    {% for order in order_list %}
+    {% for order in orders %}
     <tr>
-        <td>{{coffee.name}}</td>
-        <td>{{coffee.intensity}}</td>
+        <td>{{order.order__date}}</td>
+        <td>{% if order.paid %}Sí{% else %}No{% endif %}</td>
         <td>
-            <a class="btn btn-dark" href="/user/{{user.id}}/{{order.id}}" role="button">Detalles</a>
+            <a class="btn btn-dark" href="/user/{{order.order_id}}/{{user}}/details" role="button">Detalles</a>
         </td>
     </tr>
     {% endfor %}

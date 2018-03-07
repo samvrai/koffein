@@ -19,12 +19,17 @@
         <td>{{order.shipping}}</td>
         <td>{% if order.closed %}Sí{% else %}No{% endif %}</td>
         <td>
-            <a class="btn btn-primary {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/update_order/{{order.id}}{% endif %}" role="button">Editar</a>
-            <a class="btn btn-danger {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/delete_order/{{order.id}}{% endif %}" role="button">Eliminar</a>
-            <a class="btn btn-dark {% if order.closed %}disabled{% endif %}" href="{% if order.closed %}#{% else %}/order/{{order.id}}{% endif %}" role="button">Lista</a>
+            {% if not order.closed %}
+            <a class="btn btn-primary" href="/update_order/{{order.id}}" role="button">Editar</a>
+            <a class="btn btn-danger" href="/delete_order/{{order.id}}" role="button">Eliminar</a>
+            {% else %}
+            <a class="btn btn-success" href="/order/{{order.id}}/details" role="button">Detalles</a>
+            {% endif %}
+            <a class="btn btn-dark" href="/order/{{order.id}}" role="button">Lista</a>
         </td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
+
 {% endblock %}

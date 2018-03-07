@@ -1,3 +1,4 @@
+from django.db.models import Sum, F, FloatField, ExpressionWrapper
 from django.shortcuts import redirect
 from django.views import generic
 from .models import Coffee, Order, User, CoffeeUserOrder, CoffeeUserOrderQuantity
@@ -31,6 +32,32 @@ class OrderUserListView(generic.ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(OrderUserListView, self).get_context_data(**kwargs)
         context['order'] = self.kwargs['pk']
+        context['closed'] = Order.objects.get(pk=self.kwargs['pk']).closed
+        return context
+
+
+class OrderDetailsView(generic.TemplateView):
+    template_name = 'coffees/order_details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderDetailsView, self).get_context_data(**kwargs)
+        order = Order.objects.get(pk=self.kwargs['pk'])
+        try:
+            cuo = CoffeeUserOrder.objects.filter(order=order)
+            coffees = CoffeeUserOrderQuantity.objects.filter(
+                cuo__in=cuo).values('coffee_id', 'coffee__name', 'coffee__price').annotate(
+                quantity=Sum('quantity')).annotate(total=ExpressionWrapper(F('coffee__price') *
+                                                                           F('quantity'), output_field=FloatField()))
+            context['coffees'] = coffees
+            total = 0
+            for coffee in coffees:
+                total += coffee['total']
+            total += order.shipping
+            context['shipping'] = order.shipping
+            context['total'] = total
+        except Exception as ex:
+            return context
+
         return context
 
 
@@ -72,9 +99,21 @@ class UserListView(generic.ListView):
         return context
 
 
-class UserOrderListView(generic.ListView):
-    model = None
+class UserOrderListView(generic.TemplateView):
     template_name = 'coffees/coffeeuserorder_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserOrderListView, self).get_context_data(**kwargs)
+        user = kwargs['pk']
+        try:
+            cuo = CoffeeUserOrder.objects.filter(user=user).values('order__date', 'paid', 'order_id')
+
+        except Exception as ex:
+            return context
+
+        context['orders'] = cuo
+        context['user'] = user
+        return context
 
 
 class UserCreate(generic.FormView):
@@ -199,3 +238,34 @@ class UserDelete(generic.DeleteView):
             return None
         cuo.delete()
         return redirect(self.get_success_url())
+
+
+class UserOrderDetailsView(generic.TemplateView):
+    template_name = 'coffees/user_details.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserOrderDetailsView, self).get_context_data(**kwargs)
+        order = Order.objects.get(pk=self.kwargs['pk'])
+        user = self.kwargs['user']
+        try:
+            cuo = CoffeeUserOrder.objects.get(order=order, user=user)
+            coffees = CoffeeUserOrderQuantity.objects.filter(
+                cuo=cuo).values('coffee_id', 'coffee__name', 'coffee__price').annotate(
+                quantity=Sum('quantity')).annotate(total=ExpressionWrapper(F('coffee__price') *
+                                                                           F('quantity'), output_field=FloatField()))
+            context['coffees'] = coffees
+            users = CoffeeUserOrder.objects.filter(order=order).count()
+            total = 0
+            for coffee in coffees:
+                total += coffee['total']
+            total += order.shipping / users
+            context['shipping'] = order.shipping / users
+            context['total'] = total
+            context['order'] = self.kwargs['pk']
+            context['closed'] = order.closed
+        except Exception as ex:
+            return context
+
+        return context
+
+
