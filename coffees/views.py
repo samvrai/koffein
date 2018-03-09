@@ -1,29 +1,35 @@
 from django.db.models import Sum, F, FloatField, ExpressionWrapper
 from django.shortcuts import redirect
 from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Coffee, Order, User, CoffeeUserOrder, CoffeeUserOrderQuantity
 from coffees.forms import OrderCreateForm, OrderUpdateForm, UserCreateForm, UserUpdateForm, CoffeeSelectorForm
 
 
 # Create your views here.
-class IndexView(generic.TemplateView):
+class IndexView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'base.html'
+    login_url = '/login/'
+    redirect_field_name = ''
 
 
-class CoffeeListView(generic.ListView):
+class CoffeeListView(LoginRequiredMixin, generic.ListView):
     model = Coffee
     context_object_name = 'coffee_list'
+    login_url = '/login/'
 
 
-class OrderListView(generic.ListView):
+class OrderListView(LoginRequiredMixin, generic.ListView):
     model = Order
     context_object_name = 'order_list'
+    login_url = '/login/'
 
 
-class OrderUserListView(generic.ListView):
+class OrderUserListView(LoginRequiredMixin, generic.ListView):
     model = User
     template_name = 'coffees/order_user.html'
     context_object_name = 'user_list'
+    login_url = '/login/'
 
     def get_queryset(self):
         order = self.kwargs['pk']
@@ -36,8 +42,9 @@ class OrderUserListView(generic.ListView):
         return context
 
 
-class OrderDetailsView(generic.TemplateView):
+class OrderDetailsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'coffees/order_details.html'
+    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         context = super(OrderDetailsView, self).get_context_data(**kwargs)
@@ -61,24 +68,27 @@ class OrderDetailsView(generic.TemplateView):
         return context
 
 
-class OrderCreate(generic.CreateView):
+class OrderCreate(LoginRequiredMixin, generic.CreateView):
     model = Order
     form_class = OrderCreateForm
     success_url = '/orders'
+    login_url = '/login/'
 
 
-class OrderUpdate(generic.UpdateView):
+class OrderUpdate(LoginRequiredMixin, generic.UpdateView):
     model = Order
     form_class = OrderUpdateForm
     success_url = '/orders'
+    login_url = '/login/'
 
 
-class OrderDelete(generic.DeleteView):
+class OrderDelete(LoginRequiredMixin, generic.DeleteView):
     model = Order
     success_url = '/orders'
+    login_url = '/login/'
 
 
-class UserListView(generic.ListView):
+class UserListView(LoginRequiredMixin, generic.ListView):
     model = User
 
     def get_queryset(self):
@@ -99,8 +109,9 @@ class UserListView(generic.ListView):
         return context
 
 
-class UserOrderListView(generic.TemplateView):
+class UserOrderListView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'coffees/coffeeuserorder_list.html'
+    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         context = super(UserOrderListView, self).get_context_data(**kwargs)
@@ -116,9 +127,10 @@ class UserOrderListView(generic.TemplateView):
         return context
 
 
-class UserCreate(generic.FormView):
+class UserCreate(LoginRequiredMixin, generic.FormView):
     template_name = 'coffees/user_form.html'
     form_class = UserCreateForm
+    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -145,9 +157,10 @@ class UserCreate(generic.FormView):
         return redirect('/update_user/' + str(order.id) + '/' + str(user.id))
 
 
-class CoffeeSelector(generic.FormView):
+class CoffeeSelector(LoginRequiredMixin, generic.FormView):
     template_name = 'coffees/coffee_selector.html'
     form_class = CoffeeSelectorForm
+    login_url = '/login/'
 
     def get_form_kwargs(self):
         kwargs = super(CoffeeSelector, self).get_form_kwargs()
@@ -188,9 +201,10 @@ class CoffeeSelector(generic.FormView):
         return redirect('/update_user/' + str(self.kwargs['pk']) + '/' + str(self.kwargs['user']) + '/checkout')
 
 
-class UserUpdate(generic.FormView):
+class UserUpdate(LoginRequiredMixin, generic.FormView):
     template_name = 'coffees/update_user.html'
     form_class = UserUpdateForm
+    login_url = '/login/'
 
     def get_form_kwargs(self):
         kwargs = super(UserUpdate, self).get_form_kwargs()
@@ -223,7 +237,7 @@ class UserUpdate(generic.FormView):
         return redirect('/order/' + str(order))
 
 
-class UserDelete(generic.DeleteView):
+class UserDelete(LoginRequiredMixin, generic.DeleteView):
     model = CoffeeUserOrder
 
     def get_success_url(self):
@@ -240,7 +254,7 @@ class UserDelete(generic.DeleteView):
         return redirect(self.get_success_url())
 
 
-class UserOrderDetailsView(generic.TemplateView):
+class UserOrderDetailsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'coffees/user_details.html'
 
     def get_context_data(self, **kwargs):
@@ -267,5 +281,4 @@ class UserOrderDetailsView(generic.TemplateView):
             return context
 
         return context
-
 

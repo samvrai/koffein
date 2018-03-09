@@ -1,3 +1,4 @@
+from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from . import views
@@ -20,4 +21,6 @@ urlpatterns = [
     path('update_user/<int:pk>/<int:user>', views.CoffeeSelector.as_view(), name='select_coffee'),
     path('update_user/<int:pk>/<int:user>/checkout', views.UserUpdate.as_view(), name='update_user'),
     path('delete_user/<int:pk>/<int:user>', views.UserDelete.as_view(), name='delete_user'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='login.html'), name='logout'),
 ]
