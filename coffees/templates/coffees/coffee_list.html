@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Intensidad [1-12]</th>
+        <th scope="col">Precio</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for coffee in coffee_list %}
+    <tr>
+        <td>{{coffee.name}}</td>
+        <td>{{coffee.intensity}}</td>
+        <td>{{coffee.price}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

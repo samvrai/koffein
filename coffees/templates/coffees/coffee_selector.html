@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form method="post" action=" {% url 'coffees:select_coffee' order user %} ">{% csrf_token %}
+    {% for field in form %}
+    <div class="form-check">
+        {{ field }}
+        <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+    {% endfor %}
+    <br>
+    <button type="submit" class="btn btn-primary">Confirmar</button>
+</form>
+{% endblock %}

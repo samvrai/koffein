@@ -1,0 +1,34 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koffein</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'coffees/css/bootstrap.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'login.css' %}" />
+    <script src="{% static 'coffees/js/jquery/jquery.js' %}"></script>
+    <script src="{% static 'coffees/js/bootstrap/bootstrap.js' %}"></script>
+</head>
+<body>
+<div class="d-flex align-items-center flex-column justify-content-center h-100 bg-dark text-white" id="header">
+    <h1 class="display-4">Koffein</h1>
+    <form method="post" action="{% url 'coffees:login' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>{{ form.username.label_tag }}</label><br>
+            {{ form.username }}
+        </div>
+        <div class="form-group">
+            <label>{{ form.password.label_tag }}</label><br>
+            {{ form.password }}
+        </div>
+        <div class="form-group">
+            <button class="btn btn-info btn-lg btn-block">Acceder</button>
+        </div>
+        <input type="hidden" name="next" value="{% if next %}{{ next }}{% else %}/{% endif %}" />
+    </form>
+</div>
+</body>
+</html>

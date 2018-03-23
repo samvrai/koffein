@@ -1,0 +1,52 @@
+{% load static %}
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Koffein</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'coffees/css/bootstrap.css' %}" />
+    <script src="{% static 'coffees/js/jquery/jquery.js' %}"></script>
+    <script src="{% static 'coffees/js/bootstrap/bootstrap.js' %}"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="/">Koffein</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#menu" aria-controls="menu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="menu">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/coffees">Cafés</a>
+      </li>
+        <li class="nav-item">
+        <a class="nav-link" href="/orders">Lotes</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/users">Usuarios</a>
+      </li>
+    </ul>
+    <ul class="navbar-nav">
+      <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{user.get_username}}</a>
+          <div class="dropdown-menu dropdown-menu-right text-right" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="/logout">Cerrar sesión</a>
+          </div>
+      </li>
+    </ul>
+  </div>
+</nav>
+<br>
+<div class="container-fluid">
+{% block content %}
+{% endblock %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form class="form-inline" method="get" action="{% url 'coffees:users' %}">
+    <div class="form-group mx-sm-3 mb-2 input-group">
+        <input type="text" class="form-control" id="username" name="username" value="{{filter}}" placeholder="nombre de usuario">
+        <div class="input-group-append">
+            <span class="input-group-text" id="basic-addon2">@grupoversia.com</span>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-primary mb-2">Buscar</button>
+</form>
+
+<br>
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Nombre</th>
+        <th scope="col">Detalles</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in user_list %}
+    <tr>
+        <td>{{user.name}}</td>
+        <td>
+            <a class="btn btn-dark" href="/user/{{user.id}}" role="button">Lista</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

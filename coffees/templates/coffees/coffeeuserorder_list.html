@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Pedido</th>
+        <th scope="col">Pagado</th>
+        <th scope="col">Detalles</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr>
+        <td>{{order.order__date}}</td>
+        <td>{% if order.paid %}Sí{% else %}No{% endif %}</td>
+        <td>
+            <a class="btn btn-dark" href="/user/{{order.order_id}}/{{user}}/details" role="button">Detalles</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

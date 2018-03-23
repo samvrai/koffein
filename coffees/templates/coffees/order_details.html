@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Café</th>
+        <th scope="col">Cantidad</th>
+        <th scope="col">Precio Unitario</th>
+        <th scope="col">Precio Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for coffee in coffees %}
+    <tr>
+        <td>{{coffee.coffee__name}}</td>
+        <td>{{coffee.quantity}}</td>
+        <td>{{coffee.coffee__price}}</td>
+        <td>{{coffee.total|floatformat:2}}€</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+Portes del envio: {{shipping|floatformat:2}}€
+<br>_____________________________________________<br>
+Precio total del envio: {{total|floatformat:2}}€
+<br><br>
+<a class="btn btn-primary" href="/orders" role="button">Volver</a>
+{% endblock %}

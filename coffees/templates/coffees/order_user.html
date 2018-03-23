@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a class="btn btn-primary" href="/new_user/{{order}}" role="button">Nuevo pedido</a>
+<br><br>
+<table class="table table-striped">
+    <thead class="thead-dark">
+    <tr>
+        <th scope="col">Usuario</th>
+        <th scope="col">Pagado</th>
+        <th scope="col">{% if not closed %}Actualizar {% else %} Detalles {% endif %}</th>
+    </thead>
+    <tbody>
+    {% for user in user_list %}
+    <tr>
+        <td>{{user.name}}</td>
+        <td>{% if user.paid %}Sí{% else %}No{% endif %}</td>
+        <td>
+            {% if not closed %}
+            <a class="btn btn-primary" href="/update_user/{{order}}/{{user.id}}" role="button">Editar</a>
+            <a class="btn btn-danger " href="/delete_user/{{order}}/{{user.id}}" role="button">Eliminar</a>
+            {% else %}
+            <a class="btn btn-success" href="/user/{{order}}/{{user.id}}/details" role="button">Detalles</a>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<br><br>
+<a class="btn btn-primary" href="/orders" role="button">Volver</a>
+{% endblock %}
