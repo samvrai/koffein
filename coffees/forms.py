@@ -12,7 +12,7 @@ class OrderCreateForm(forms.ModelForm):
         }
         widgets = {
             'date': forms.DateInput(attrs={'class': 'form-control', 'id': 'date', 'placeholder': 'dd/mm/yyyy'},
-                                    format='%d-%m-%Y'),
+                                    format='%d/%m/%Y'),
             'shipping': forms.NumberInput(attrs={'class': 'form-control', 'id': 'shipping', 'placeholder': '00,00'})
         }
 
@@ -28,7 +28,7 @@ class OrderUpdateForm(forms.ModelForm):
         }
         widgets = {
             'date': forms.DateInput(attrs={'class': 'form-control', 'id': 'date', 'placeholder': 'dd/mm/yyyy'},
-                                    format='%d-%m-%Y'),
+                                    format='%d/%m/%Y'),
             'shipping': forms.NumberInput(attrs={'class': 'form-control', 'id': 'shipping', 'placeholder': '00,00'}),
             'closed': forms.CheckboxInput(attrs={'class': 'form-control', 'id': 'closed'})
         }
