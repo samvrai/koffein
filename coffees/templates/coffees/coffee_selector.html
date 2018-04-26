@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form method="post" action=" {% url 'coffees:select_coffee' order user %} ">{% csrf_token %}
+<form method="post" action=" {% url 'coffees:select_coffee' order user_target %} ">{% csrf_token %}
     {% for field in form %}
     <div class="form-check">
         {{ field }}

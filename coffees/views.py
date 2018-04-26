@@ -90,6 +90,7 @@ class OrderDelete(LoginRequiredMixin, generic.DeleteView):
 
 class UserListView(LoginRequiredMixin, generic.ListView):
     model = User
+    template_name = 'coffees/user_list.html'
 
     def get_queryset(self):
         try:
@@ -115,15 +116,15 @@ class UserOrderListView(LoginRequiredMixin, generic.TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserOrderListView, self).get_context_data(**kwargs)
-        user = kwargs['pk']
+        user_target = kwargs['pk']
         try:
-            cuo = CoffeeUserOrder.objects.filter(user=user).values('order__date', 'paid', 'order_id')
+            cuo = CoffeeUserOrder.objects.filter(user=user_target).values('order__date', 'paid', 'order_id')
 
         except Exception as ex:
             return context
 
         context['orders'] = cuo
-        context['user'] = user
+        context['user_target'] = user_target
         return context
 
 
@@ -144,10 +145,13 @@ class UserCreate(LoginRequiredMixin, generic.FormView):
 
     def post(self, request, *args, **kwargs):
         try:
-            user = User.objects.get(name=request.POST['name'])
+            user = User.objects.get(username=request.POST['username'])
         except User.DoesNotExist:
-            user = User(name=request.POST['name'])
+            user = User(username=request.POST['username'])
             user.save()
+        except Exception as ex:
+            tr = ex
+
         order = Order.objects.get(id=int(request.POST['orders']))
         try:
             CoffeeUserOrder.objects.get(order=order, user=user)
@@ -164,13 +168,13 @@ class CoffeeSelector(LoginRequiredMixin, generic.FormView):
 
     def get_form_kwargs(self):
         kwargs = super(CoffeeSelector, self).get_form_kwargs()
-        kwargs['user'] = self.kwargs['user']
+        kwargs['user_target'] = self.kwargs['user_target']
         kwargs['order'] = self.kwargs['pk']
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super(CoffeeSelector, self).get_context_data(**kwargs)
-        context['user'] = self.kwargs['user']
+        context['user_target'] = self.kwargs['user_target']
         context['order'] = self.kwargs['pk']
         return context
 
@@ -180,12 +184,12 @@ class CoffeeSelector(LoginRequiredMixin, generic.FormView):
             if i.startswith('coffee'):
                 selected.append(int(i.split('_')[1]))
 
-        order = kwargs['pk']
-        user = kwargs['user']
+        order = Order.objects.get(id=kwargs['pk'])
+        user_target = User.objects.get(id=kwargs['user_target'])
         try:
-            cuo = CoffeeUserOrder.objects.get(order=order, user=user)
+            cuo = CoffeeUserOrder.objects.get(order=order, user=user_target)
         except CoffeeUserOrder.DoesNotExist:
-            return None
+            cuo = CoffeeUserOrder(order=order, user=user_target)
 
         for coffee in selected:
             coffee_aux = Coffee.objects.get(pk=coffee)
@@ -198,7 +202,7 @@ class CoffeeSelector(LoginRequiredMixin, generic.FormView):
         for coffee in coffees_remove:
             cuo.coffees.remove(coffee)
 
-        return redirect('/update_user/' + str(self.kwargs['pk']) + '/' + str(self.kwargs['user']) + '/checkout')
+        return redirect('/update_user/' + str(self.kwargs['pk']) + '/' + str(self.kwargs['user_target']) + '/checkout')
 
 
 class UserUpdate(LoginRequiredMixin, generic.FormView):
@@ -208,25 +212,25 @@ class UserUpdate(LoginRequiredMixin, generic.FormView):
 
     def get_form_kwargs(self):
         kwargs = super(UserUpdate, self).get_form_kwargs()
-        kwargs['user'] = self.kwargs['user']
+        kwargs['user_target'] = self.kwargs['user_target']
         kwargs['order'] = self.kwargs['pk']
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super(UserUpdate, self).get_context_data(**kwargs)
-        context['user'] = self.kwargs['user']
+        context['user_target'] = self.kwargs['user_target']
         context['order'] = self.kwargs['pk']
         return context
 
     def post(self, request, *args, **kwargs):
         order = kwargs['pk']
-        user = kwargs['user']
+        user_target = kwargs['user_target']
         coffees = []
         for data in request.POST:
             if data.startswith('coffee'):
                 coffees.append({'key': int(data.split('_')[1]),  'quantity': int(request.POST[data])})
         try:
-            cuo = CoffeeUserOrder.objects.get(order=order, user=user)
+            cuo = CoffeeUserOrder.objects.get(order=order, user=user_target)
         except CoffeeUserOrder.DoesNotExist:
             return None
 
@@ -234,20 +238,26 @@ class UserUpdate(LoginRequiredMixin, generic.FormView):
             c_2 = CoffeeUserOrderQuantity.objects.get(coffee=coffee['key'], cuo=cuo)
             c_2.quantity = coffee['quantity']
             c_2.save()
-        return redirect('/order/' + str(order))
+
+        if request.user.is_staff:
+            returner = '/order/' + str(order)
+        else:
+            returner = '/orders'
+        return redirect(returner)
 
 
 class UserDelete(LoginRequiredMixin, generic.DeleteView):
     model = CoffeeUserOrder
+    login_url = '/login/'
 
     def get_success_url(self):
         return '/order/' + str(self.kwargs['pk'])
 
     def post(self, request, *args, **kwargs):
         order = kwargs['pk']
-        user = kwargs['user']
+        user_target = kwargs['user_target']
         try:
-            cuo = CoffeeUserOrder.objects.get(order=order, user=user)
+            cuo = CoffeeUserOrder.objects.get(order=order, user=user_target)
         except CoffeeUserOrder.DoesNotExist:
             return None
         cuo.delete()
@@ -256,13 +266,14 @@ class UserDelete(LoginRequiredMixin, generic.DeleteView):
 
 class UserOrderDetailsView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'coffees/user_details.html'
+    login_url = '/login/'
 
     def get_context_data(self, **kwargs):
         context = super(UserOrderDetailsView, self).get_context_data(**kwargs)
         order = Order.objects.get(pk=self.kwargs['pk'])
-        user = self.kwargs['user']
+        user_target = self.kwargs['user_target']
         try:
-            cuo = CoffeeUserOrder.objects.get(order=order, user=user)
+            cuo = CoffeeUserOrder.objects.get(order=order, user=user_target)
             coffees = CoffeeUserOrderQuantity.objects.filter(
                 cuo=cuo).values('coffee_id', 'coffee__name', 'coffee__price').annotate(
                 quantity=Sum('quantity')).annotate(total=ExpressionWrapper(F('coffee__price') *

@@ -15,7 +15,7 @@
         <td>{{order.order__date}}</td>
         <td>{% if order.paid %}Sí{% else %}No{% endif %}</td>
         <td>
-            <a class="btn btn-dark" href="/user/{{order.order_id}}/{{user}}/details" role="button">Detalles</a>
+            <a class="btn btn-dark" href="/user/{{order.order_id}}/{{user_target}}/details" role="button">Detalles</a>
         </td>
     </tr>
     {% endfor %}

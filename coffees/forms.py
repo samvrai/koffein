@@ -1,5 +1,6 @@
 from django import forms
-from .models import Order, User, Coffee, CoffeeUserOrder, CoffeeUserOrderQuantity
+from .models import Order, Coffee, CoffeeUserOrder, CoffeeUserOrderQuantity
+from django.contrib.auth.models import User
 
 
 class OrderCreateForm(forms.ModelForm):
@@ -37,24 +38,31 @@ class OrderUpdateForm(forms.ModelForm):
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name']
+        fields = ['username']
         excluded = ['orders']
         labels = {
-            'name': 'Nombre',
+            'username': 'Nombre',
+        }
+        help_texts = {
+            'username': ''
         }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'id': 'name', 'placeholder': 'nombre.apellido'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'id': 'name',
+                                               'placeholder': 'nombre.apellido'}),
         }
+
+    def post(self):
+        return None
 
 
 class CoffeeSelectorForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        order = kwargs.pop('order', None)
-        user = kwargs.pop('user', None)
+        order = Order.objects.get(id=kwargs.pop('order', None))
+        user_target = User.objects.get(id=kwargs.pop('user_target', None))
 
         super(CoffeeSelectorForm, self).__init__(*args, **kwargs)
 
-        coffee_list = CoffeeUserOrder.objects.get(order=order, user=user)
+        coffee_list, created = CoffeeUserOrder.objects.get_or_create(order=order, user=user_target)
 
         for coffee in Coffee.objects.all():
             if coffee in coffee_list.coffees.all():
@@ -71,7 +79,7 @@ class CoffeeSelectorForm(forms.Form):
 class UserUpdateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         order = kwargs.pop('order', None)
-        user = kwargs.pop('user', None)
+        user = kwargs.pop('user_target', None)
 
         super(UserUpdateForm, self).__init__(*args, **kwargs)
 

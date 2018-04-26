@@ -13,7 +13,7 @@
     <tbody>
     {% for user in user_list %}
     <tr>
-        <td>{{user.name}}</td>
+        <td>{{user.username}}</td>
         <td>{% if user.paid %}Sí{% else %}No{% endif %}</td>
         <td>
             {% if not closed %}

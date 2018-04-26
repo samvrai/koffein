@@ -22,12 +22,14 @@
     </thead>
     <tbody>
     {% for user in user_list %}
+    {% if not user.is_staff%}
     <tr>
-        <td>{{user.name}}</td>
+        <td>{{user.username}}</td>
         <td>
             <a class="btn btn-dark" href="/user/{{user.id}}" role="button">Lista</a>
         </td>
     </tr>
+    {% endif %}
     {% endfor %}
     </tbody>
 </table>

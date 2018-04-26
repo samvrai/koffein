@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if user.is_staff %}
 <a class="btn btn-primary" href="/new_order/" role="button">Nuevo lote</a>
+{% endif %}
 <br><br>
 <table class="table table-striped">
     <thead class="thead-dark">
@@ -9,7 +11,11 @@
         <th scope="col">Fecha de cierre</th>
         <th scope="col">Portes</th>
         <th scope="col">Cerrado</th>
+        {% if user.is_staff %}
         <th scope="col">Actualizar</th>
+        {% else %}
+        <th scope="col">Acciones</th>
+        {% endif %}
     </tr>
     </thead>
     <tbody>
@@ -18,6 +24,7 @@
         <td>{{order.date}}</td>
         <td>{{order.shipping}}</td>
         <td>{% if order.closed %}Sí{% else %}No{% endif %}</td>
+        {% if user.is_staff %}
         <td>
             {% if not order.closed %}
             <a class="btn btn-primary" href="/update_order/{{order.id}}" role="button">Editar</a>
@@ -27,6 +34,13 @@
             {% endif %}
             <a class="btn btn-dark" href="/order/{{order.id}}" role="button">Lista</a>
         </td>
+        {% else %}
+        <td>
+            {% if not order.closed %}
+            <a class="btn btn-dark" href="/update_user/{{order.id}}/{{user.id}}" role="button">Pedido</a>
+            {% endif %}
+        </td>
+        {% endif %}
     </tr>
     {% endfor %}
     </tbody>

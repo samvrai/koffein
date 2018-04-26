@@ -28,13 +28,19 @@
         <li class="nav-item">
         <a class="nav-link" href="/orders">Lotes</a>
       </li>
+      {% if user.is_staff %}
       <li class="nav-item">
         <a class="nav-link" href="/users">Usuarios</a>
       </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="/user/{{user.id}}">Pedidos</a>
+      </li>
+      {% endif %}
     </ul>
     <ul class="navbar-nav">
       <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{user.get_username}}</a>
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{user.username}}</a>
           <div class="dropdown-menu dropdown-menu-right text-right" aria-labelledby="navbarDropdown">
               <a class="dropdown-item" href="/logout">Cerrar sesión</a>
           </div>
