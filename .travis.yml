@@ -24,4 +24,4 @@ install:
   - docker-compose -f docker-compose.yml up --build -d
 
 script:
-  - manage.py runserver 0.0.0.0:8000
+  - python manage.py runserver 0.0.0.0:8000
