@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<form class="form-inline" method="get" action="{% url 'coffees:users' %}">
-    <div class="form-group mx-sm-3 mb-2 input-group">
+<a class="btn btn-primary" href="/new_user/" role="button">Nuevo usuario</a>
+
+<form style="float:right" class="form-inline" method="get" action="{% url 'coffees:users' %}">
+    <div style="float:right" class="form-group mx-sm-3 mb-2 input-group">
         <input type="text" class="form-control" id="username" name="username" value="{{filter}}" placeholder="nombre de usuario">
         <div class="input-group-append">
-            <span class="input-group-text" id="basic-addon2">@grupoversia.com</span>
+            <span class="input-group-text" id="basic-addon2">@versia.com</span>
         </div>
     </div>
     <button type="submit" class="btn btn-primary mb-2">Buscar</button>
 </form>
-
-<br>
 
 <table class="table table-striped">
     <thead class="thead-dark">

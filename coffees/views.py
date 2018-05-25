@@ -1,6 +1,7 @@
 from django.db.models import Sum, F, FloatField, ExpressionWrapper
 from django.shortcuts import redirect
 from django.views import generic
+from django.core import mail
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Coffee, Order, User, CoffeeUserOrder, CoffeeUserOrderQuantity
 from coffees.forms import OrderCreateForm, OrderUpdateForm, UserCreateForm, UserUpdateForm, CoffeeSelectorForm
@@ -99,7 +100,7 @@ class UserListView(LoginRequiredMixin, generic.ListView):
             username = ''
 
         if username != '':
-            object_list = self.model.objects.filter(name__contains=username)
+            object_list = self.model.objects.filter(username__contains=username)
         else:
             object_list = self.model.objects.all()
         return object_list
@@ -137,7 +138,8 @@ class UserCreate(LoginRequiredMixin, generic.FormView):
         # Call the base implementation first to get a context
         context = super(UserCreate, self).get_context_data(**kwargs)
         # Add in a QuerySet of all the books
-        context['order'] = self.kwargs['pk']
+        if 'pk' in self.kwargs:
+            context['order'] = self.kwargs['pk']
         return context
 
     def get_success_url(self):
@@ -147,12 +149,20 @@ class UserCreate(LoginRequiredMixin, generic.FormView):
         try:
             user = User.objects.get(username=request.POST['username'])
         except User.DoesNotExist:
-            user = User(username=request.POST['username'])
+            pw = User.objects.make_random_password()
+            user = User.objects.create_user(username=request.POST['username'],
+                                            email=request.POST['username'] + '@versia.com',
+                                            password=pw)
             user.save()
+            mail.send_mail('Koffein Service', 'Tu contraseña es ' + pw, 'asier.esteban@versia.com',
+                           [request.POST['username'] + '@versia.com'])
         except Exception as ex:
             tr = ex
 
-        order = Order.objects.get(id=int(request.POST['orders']))
+        if 'orders' in request.POST and request.POST['orders'] != '':
+            order = Order.objects.get(id=int(request.POST['orders']))
+        else:
+            return redirect('/users/')
         try:
             CoffeeUserOrder.objects.get(order=order, user=user)
         except CoffeeUserOrder.DoesNotExist:
@@ -200,7 +210,8 @@ class CoffeeSelector(LoginRequiredMixin, generic.FormView):
         coffees_remove = cuo.coffees.exclude(id__in=selected)
 
         for coffee in coffees_remove:
-            cuo.coffees.remove(coffee)
+            c = CoffeeUserOrderQuantity.objects.get(coffee=coffee, cuo=cuo)
+            c.delete()
 
         return redirect('/update_user/' + str(self.kwargs['pk']) + '/' + str(self.kwargs['user_target']) + '/checkout')
 
@@ -234,10 +245,13 @@ class UserUpdate(LoginRequiredMixin, generic.FormView):
         except CoffeeUserOrder.DoesNotExist:
             return None
 
-        for coffee in coffees:
-            c_2 = CoffeeUserOrderQuantity.objects.get(coffee=coffee['key'], cuo=cuo)
-            c_2.quantity = coffee['quantity']
-            c_2.save()
+        if len(coffees) == 0:
+            cuo.delete()
+        else:
+            for coffee in coffees:
+                c_2 = CoffeeUserOrderQuantity.objects.get(coffee=coffee['key'], cuo=cuo)
+                c_2.quantity = coffee['quantity']
+                c_2.save()
 
         if request.user.is_staff:
             returner = '/order/' + str(order)
